@@ -28,7 +28,7 @@ func main() {
 
 	mux := setupMux(index)
 
-	const tls = false
+	const tls = true
 	if tls {
 		go func() {
 			log.Printf("Listening on :80 for redirects\n")

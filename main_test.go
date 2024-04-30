@@ -3,19 +3,18 @@ package main
 import (
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/require"
 )
 
 func TestIndex(t *testing.T) {
-	index := newIndex()
+	index := NewIndex()
 	index.AddSong("300", "Armin", "Song1", "10:00")
 	index.AddSong("300", "Mat Zoo", "Clockwork", "01:00")
 	index.AddSong("306", "Mat Zoo", "Song1", "01:00")
 	index.AddSong("302", "Armin", "Clockwork", "10:00")
 
-	println(spew.Sdump(index.SearchSong("cLock")))
-	println(spew.Sdump(index.SearchSong("zoo")))
+	require.Len(t, index.SearchSong("cLock"), 2)
+	require.Len(t, index.SearchSong("zoo"), 2)
 }
 
 const content1 = `PERFORMER "Armin van Buuren"
@@ -42,10 +41,6 @@ FILE "Armin van Buuren - A State Of Trance 1169 (256 Kbps) baby967.mp3" MP3
     PERFORMER "AOA"
     TITLE "Burn (The Rise)"
     INDEX 01 00:41:27
-  TRACK 03 AUDIO
-    PERFORMER "Steve Brian"
-    TITLE "The Observer"
-    INDEX 01 04:12:03
 `
 
 func TestTitleRG(t *testing.T) {
@@ -54,6 +49,6 @@ func TestTitleRG(t *testing.T) {
 		require.Len(t, titleSubmatches, 1)
 
 		songPerformerSubmatches := songRG.FindAllStringSubmatch(content, -1)
-		require.Len(t, songPerformerSubmatches, 52)
+		require.Len(t, songPerformerSubmatches, 2)
 	}
 }

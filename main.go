@@ -213,8 +213,8 @@ func (i *indexBuilder) IndexCUE(path string) error {
 	for _, submatches := range songSubmatches {
 		songPerformer := submatches[1]
 		songTitle := submatches[2]
-		songIndex := submatches[3]
-		i.index.AddSong(episode, songPerformer, songTitle, songIndex)
+		songTimeIndex := submatches[3]
+		i.index.AddSong(episode, songPerformer, songTitle, songTimeIndex)
 	}
 
 	return nil

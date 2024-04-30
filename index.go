@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -10,7 +11,7 @@ type Song struct {
 	title     string
 	signature string
 	episode   string
-	index     string
+	timeIndex string
 }
 
 type trieNode struct {
@@ -36,22 +37,22 @@ func NewIndex() *index {
 
 var signatureRG = regexp.MustCompile(`[^a-zA-Z0-9]+`)
 
-func (i *index) AddSong(episode, performer, title, index string) {
+func (idx *index) AddSong(episode, performer, title, timeIndex string) {
 	songPerformerLower := strings.ToLower(performer)
 	songTitleLower := strings.ToLower(title)
 	performerWords := strings.Fields(songPerformerLower)
 	titleWords := strings.Fields(songTitleLower)
 
 	song := &Song{
-		title:     fmt.Sprintf("%s — %s (%s)", performer, title, index),
+		title:     fmt.Sprintf("%s — %s (%s)", performer, title, timeIndex),
 		signature: signatureRG.ReplaceAllString(songPerformerLower+songTitleLower, ""),
 		episode:   episode,
-		index:     index,
+		timeIndex: timeIndex,
 	}
 
 	for _, words := range [][]string{performerWords, titleWords} {
 		for _, word := range words {
-			curNode := &i.trieRoot
+			curNode := &idx.trieRoot
 			for i, char := range word {
 				if curNode.children[char] == nil {
 					curNode.children[char] = newTrieNode()
@@ -71,21 +72,26 @@ func (i *index) AddSong(episode, performer, title, index string) {
 
 func containsSong(curNode *trieNode, song *Song) bool {
 	for _, curNodeSong := range curNode.songs {
+		if curNodeSong.episode != song.episode {
+			continue
+		}
 		if curNodeSong.signature == song.signature {
 			return true
 		}
-		if curNodeSong.episode == song.episode && curNodeSong.index == song.index {
+		if curNodeSong.timeIndex == song.timeIndex {
 			return true
 		}
 	}
 	return false
 }
 
-func (i *index) SearchSong(song string) []*Song {
+func (idx *index) SearchSong(song string) []*Song {
 	var results []*Song
 	words := strings.Fields(strings.ToLower(song))
+
+	songRank := make(map[*Song]int)
 	for _, word := range words {
-		curNode := &i.trieRoot
+		curNode := &idx.trieRoot
 		for _, char := range word {
 			if curNode.children[char] == nil {
 				curNode = nil
@@ -94,8 +100,19 @@ func (i *index) SearchSong(song string) []*Song {
 			curNode = curNode.children[char]
 		}
 		if curNode != nil {
-			results = append(results, curNode.songs...)
+			for i := len(curNode.songs) - 1; i >= 0; i-- {
+				song := curNode.songs[i]
+				if rank, ok := songRank[song]; ok {
+					songRank[song] = rank + 10000
+					continue
+				}
+				songRank[song] = i
+				results = append(results, song)
+			}
 		}
 	}
+	slices.SortFunc(results, func(a, b *Song) int {
+		return songRank[b] - songRank[a]
+	})
 	return results
 }

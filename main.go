@@ -17,6 +17,9 @@ import (
 //go:embed all:asot
 var resourceFiles embed.FS
 
+//go:embed index.html
+var indexFile embed.FS
+
 func main() {
 	index, err := NewIndexBuilder().BuildIndex()
 	if err != nil {
@@ -25,7 +28,7 @@ func main() {
 
 	mux := setupMux(index)
 
-	const tls = true
+	const tls = false
 	if tls {
 		go func() {
 			log.Printf("Listening on :80 for redirects\n")
@@ -56,13 +59,13 @@ func main() {
 func setupMux(index *index) *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", func(rw http.ResponseWriter, r *http.Request) {
-		http.ServeFile(rw, r, "index.html")
+		http.ServeFileFS(rw, r, indexFile, "index.html")
 	})
 	mux.Handle("GET /asot/", http.FileServerFS(resourceFiles))
 	mux.HandleFunc("GET /asot/{$}", func(rw http.ResponseWriter, r *http.Request) {
 		http.ServeFileFS(rw, r, resourceFiles, "/asot/index.html")
 	})
-	mux.HandleFunc("mias.top /", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("mias.top/", func(rw http.ResponseWriter, r *http.Request) {
 		targetUrl := url.URL{
 			Scheme:   "https",
 			Host:     "www.mias.top",

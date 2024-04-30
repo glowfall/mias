@@ -20,6 +20,11 @@ var resourceFiles embed.FS
 //go:embed index.html
 var indexFile embed.FS
 
+//go:embed favicon.ico
+//go:embed site.webmanifest
+//go:embed *.png
+var faviconFiles embed.FS
+
 func main() {
 	index, err := NewIndexBuilder().BuildIndex()
 	if err != nil {
@@ -61,6 +66,13 @@ func setupMux(index *index) *http.ServeMux {
 	mux.HandleFunc("GET /{$}", func(rw http.ResponseWriter, r *http.Request) {
 		http.ServeFileFS(rw, r, indexFile, "index.html")
 	})
+	faviconDir, err := faviconFiles.ReadDir(".")
+	if err != nil {
+		panic(err)
+	}
+	for _, entry := range faviconDir {
+		mux.Handle("GET /"+entry.Name(), http.FileServerFS(faviconFiles))
+	}
 	mux.Handle("GET /asot/", http.FileServerFS(resourceFiles))
 	mux.HandleFunc("GET /asot/{$}", func(rw http.ResponseWriter, r *http.Request) {
 		http.ServeFileFS(rw, r, resourceFiles, "/asot/index.html")

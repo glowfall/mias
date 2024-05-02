@@ -4,6 +4,7 @@ import (
 	"embed"
 	_ "embed"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html"
 	"log"
@@ -13,6 +14,8 @@ import (
 	"time"
 	"unicode/utf8"
 )
+
+var useTLS = flag.Bool("useTLS", true, "--useTLS=false")
 
 //go:embed all:asot
 var resourceFiles embed.FS
@@ -26,6 +29,8 @@ var indexFile embed.FS
 var faviconFiles embed.FS
 
 func main() {
+	flag.Parse()
+
 	index, err := NewIndexBuilder().BuildIndex()
 	if err != nil {
 		panic(err)
@@ -33,8 +38,7 @@ func main() {
 
 	mux := setupMux(index)
 
-	const tls = true
-	if tls {
+	if *useTLS {
 		go func() {
 			log.Printf("Listening on :80 for redirects\n")
 			if err := http.ListenAndServe(":80", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {

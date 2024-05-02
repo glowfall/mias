@@ -8,10 +8,11 @@ import (
 )
 
 type Song struct {
-	title     string
-	signature string
-	episode   string
-	timeIndex string
+	title       string
+	signature   string
+	episode     string
+	timeIndex   string
+	episodeHash string
 }
 
 type trieNode struct {
@@ -37,17 +38,18 @@ func NewIndex() *index {
 
 var signatureRG = regexp.MustCompile(`[^a-zA-Z0-9]+`)
 
-func (idx *index) AddSong(episode, performer, title, timeIndex string) {
+func (idx *index) AddSong(episodeHash, episode, performer, title, timeIndex string) {
 	songPerformerLower := strings.ToLower(performer)
 	songTitleLower := strings.ToLower(title)
 	performerWords := strings.Fields(songPerformerLower)
 	titleWords := strings.Fields(songTitleLower)
 
 	song := &Song{
-		title:     fmt.Sprintf("%s — %s (%s)", performer, title, timeIndex),
-		signature: signatureRG.ReplaceAllString(songPerformerLower+songTitleLower, ""),
-		episode:   episode,
-		timeIndex: timeIndex,
+		title:       fmt.Sprintf("%s — %s (%s)", performer, title, timeIndex),
+		signature:   signatureRG.ReplaceAllString(songPerformerLower+songTitleLower, ""),
+		episode:     episode,
+		timeIndex:   timeIndex,
+		episodeHash: episodeHash,
 	}
 
 	for _, words := range [][]string{performerWords, titleWords} {

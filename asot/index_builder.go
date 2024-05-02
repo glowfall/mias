@@ -1,49 +1,20 @@
 package asot
 
 import (
-	"encoding/json"
 	"fmt"
 	"html"
-	"net/http"
 	"regexp"
 	"unicode/utf8"
 )
-
-func writeResults(rw http.ResponseWriter, results []string, count int) {
-	result, err := json.Marshal(struct {
-		Results []string `json:"results"`
-		Count   int      `json:"count"`
-	}{
-		Results: results,
-		Count:   count,
-	})
-	if err != nil {
-		writeError(rw, "Unable to marshal result", err)
-		return
-	}
-
-	if _, err := rw.Write(result); err != nil {
-		writeError(rw, "Unable to write result", err)
-		return
-	}
-}
-
-func writeError(rw http.ResponseWriter, msg string, err error) {
-	_, innerErr := rw.Write([]byte(fmt.Sprintf(`{"results":"%s: %+v"}`, msg, err)))
-	if innerErr != nil {
-		fmt.Printf("Unable to write err: %+v", innerErr)
-	}
-	return
-}
 
 type indexBuilder struct {
 	downloader *cachingDownloader
 	index      *index
 }
 
-func NewIndexBuilder() *indexBuilder {
+func NewIndexBuilder(downloader *cachingDownloader) *indexBuilder {
 	return &indexBuilder{
-		downloader: NewCachingDownloader(),
+		downloader: downloader,
 		index:      NewIndex(),
 	}
 }
@@ -57,7 +28,7 @@ func (i *indexBuilder) BuildIndex() (*index, error) {
 		return nil, err
 	}
 
-	submatches := hrefRegexp.FindAllStringSubmatch(string(body), -1)
+	submatches := hrefRegexp.FindAllStringSubmatch(body, -1)
 	fmt.Printf("submatches: %v\n", len(submatches))
 
 	for _, match := range submatches {
@@ -100,6 +71,7 @@ func (i *indexBuilder) IndexCUE(path string) error {
 		return fmt.Errorf("no title found in %s", link)
 	}
 	episode := titleSubmatches[0][1]
+	episodeHash := i.downloader.LinkHash(link)
 
 	songSubmatches := songRG.FindAllStringSubmatch(bodyStr, -1)
 	if len(songSubmatches) == 0 {
@@ -114,8 +86,12 @@ func (i *indexBuilder) IndexCUE(path string) error {
 		songPerformer := submatches[1]
 		songTitle := submatches[2]
 		songTimeIndex := submatches[3]
-		i.index.AddSong(episode, songPerformer, songTitle, songTimeIndex)
+		i.index.AddSong(episodeHash, episode, songPerformer, songTitle, songTimeIndex)
 	}
 
 	return nil
+}
+
+func (i *indexBuilder) TracklistByHash(hash string) (string, error) {
+	return i.downloader.GetCached(hash)
 }

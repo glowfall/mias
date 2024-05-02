@@ -4,8 +4,10 @@ import (
 	"crypto/sha1"
 	"crypto/tls"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -49,12 +51,11 @@ func NewCachingDownloader() *cachingDownloader {
 }
 
 func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
-	cachedPath := d.cacheDir + "/" + getLinkHash(link)
-
-	body, err := os.ReadFile(cachedPath)
-	if err == nil {
+	if result, err := d.GetCached(d.LinkHash(link)); err == nil {
 		fmt.Printf("found in cache: %s\n", link)
-		return string(body), nil
+		return result, nil
+	} else if !errors.Is(err, fs.ErrNotExist) {
+		return "", err
 	}
 
 	fmt.Printf("downloading: %s\n", link)
@@ -71,10 +72,12 @@ func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err = io.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
+
+	cachedPath := d.cachedPath(d.LinkHash(link))
 
 	if err := os.WriteFile(cachedPath, body, 0777); err != nil {
 		fmt.Printf("unable to write to cache %s: %+v\n", cachedPath, err)
@@ -83,7 +86,22 @@ func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
 	return string(body), nil
 }
 
-func getLinkHash(link string) string {
+func (d *cachingDownloader) GetCached(hash string) (string, error) {
+	cachedPath := d.cachedPath(hash)
+
+	body, err := os.ReadFile(cachedPath)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}
+
+func (d *cachingDownloader) cachedPath(hash string) string {
+	return d.cacheDir + "/" + hash
+}
+
+func (d *cachingDownloader) LinkHash(link string) string {
 	sha := sha1.New()
 	sha.Write([]byte(link))
 	return hex.EncodeToString(sha.Sum(nil))

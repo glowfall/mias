@@ -77,13 +77,15 @@ func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
 		return "", err
 	}
 
+	bodyStr := cp1252ToUTF8(string(body))
+
 	cachedPath := d.cachedPath(d.LinkHash(link))
 
-	if err := os.WriteFile(cachedPath, body, 0777); err != nil {
+	if err := os.WriteFile(cachedPath, []byte(bodyStr), 0777); err != nil {
 		fmt.Printf("unable to write to cache %s: %+v\n", cachedPath, err)
 	}
 
-	return string(body), nil
+	return bodyStr, nil
 }
 
 func (d *cachingDownloader) GetCached(hash string) (string, error) {

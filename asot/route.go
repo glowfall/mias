@@ -62,6 +62,7 @@ func Setup(mux *http.ServeMux) {
 				panic(err)
 			}
 		}
+		content = formatTracklist(content)
 		_, err = rw.Write([]byte(content))
 		if err != nil {
 			panic(err)

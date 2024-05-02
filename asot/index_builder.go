@@ -64,8 +64,6 @@ func (i *indexBuilder) IndexCUE(path string) error {
 		return nil
 	}
 
-	bodyStr = cp1252ToUTF8(bodyStr)
-
 	titleSubmatches := episodeRG.FindAllStringSubmatch(bodyStr, -1)
 	if len(titleSubmatches) == 0 {
 		return fmt.Errorf("no title found in %s", link)

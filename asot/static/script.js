@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
             resultElement.innerHTML = `<p>${result.title}</p>`;
 
             resultElement.addEventListener('click', async () => {
+                if (window.getSelection().toString().length) {
+                    return
+                }
                 if (!resultElement.dataset.loaded) {
                     const tracklist = await fetchTracklist(result.episodeHash);
                     const tracklistElement = document.createElement('div');

@@ -23,22 +23,25 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
         }
 
         h1 {
             margin-bottom: 20px;
-            font-size: 24px;
+            font-size: 5vw;
         }
 
         #countdown {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .time-box {
             background: rgba(255, 255, 255, 0.2);
-            padding: 20px;
+            padding: 15px;
             border-radius: 10px;
             width: 80px;
             text-align: center;
@@ -46,12 +49,26 @@
 
         .time {
             display: block;
-            font-size: 36px;
+            font-size: 6vw;
             margin-bottom: 5px;
         }
 
         .label {
-            font-size: 14px;
+            font-size: 3vw;
+        }
+
+        @media (min-width: 600px) {
+            .time-box {
+                width: 100px;
+            }
+
+            .time {
+                font-size: 36px;
+            }
+
+            .label {
+                font-size: 14px;
+            }
         }
     </style>
 </head>

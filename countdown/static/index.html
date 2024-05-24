@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            font-family: 'Arial', sans-serif;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        #countdown {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            width: 80px;
+            text-align: center;
+        }
+
+        .time {
+            display: block;
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        .label {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Николай Викторович stays sober until</h1>
+    <div id="countdown">
+        <div class="time-box">
+            <span class="time" id="days"></span>
+            <span class="label">Days</span>
+        </div>
+        <div class="time-box">
+            <span class="time" id="hours"></span>
+            <span class="label">Hours</span>
+        </div>
+        <div class="time-box">
+            <span class="time" id="minutes"></span>
+            <span class="label">Minutes</span>
+        </div>
+        <div class="time-box">
+            <span class="time" id="seconds"></span>
+            <span class="label">Seconds</span>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countdownElement = document.getElementById('countdown');
+        const daysElement = document.getElementById('days');
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+
+        function updateCountdown() {
+            const targetDate = new Date('2024-05-25T18:00:00+03:00');
+            const currentDate = new Date();
+            const totalSeconds = (targetDate - currentDate) / 1000;
+
+            const days = Math.floor(totalSeconds / 3600 / 24);
+            const hours = Math.floor(totalSeconds / 3600) % 24;
+            const minutes = Math.floor(totalSeconds / 60) % 60;
+            const seconds = Math.floor(totalSeconds) % 60;
+
+            daysElement.innerHTML = days;
+            hoursElement.innerHTML = hours;
+            minutesElement.innerHTML = minutes;
+            secondsElement.innerHTML = seconds;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // initial call to set values immediately
+    });
+</script>
+</body>
+</html>

@@ -9,7 +9,6 @@ import (
 	"net/url"
 
 	"github.com/glowfall/asot/asot"
-	"github.com/glowfall/asot/countdown"
 )
 
 var useTLS = flag.Bool("useTLS", true, "--useTLS=false")
@@ -71,6 +70,5 @@ func setupMux() *http.ServeMux {
 	})
 
 	asot.Setup(mux)
-	countdown.Setup(mux)
 	return mux
 }

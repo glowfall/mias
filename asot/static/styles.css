@@ -88,16 +88,16 @@ form {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 6px 14px;
+    gap: 14px;
+    padding: 10px 18px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
+    border-radius: 24px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     margin-right: 10px;
     opacity: 0;
     transform: translateX(20px);
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 240px;
+    width: 280px;
 }
 
 .progress-panel.visible {
@@ -112,17 +112,17 @@ form {
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
+    padding: 10px 18px;
     background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-    border-radius: 20px;
+    border-radius: 24px;
     box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
     margin-right: 10px;
     opacity: 0;
     transform: translateX(20px);
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 240px;
+    width: 280px;
     position: absolute;
-    right: 50px;
+    right: 58px;
 }
 
 .error-panel.visible {
@@ -133,14 +133,14 @@ form {
 }
 
 .error-message {
-    font-size: 12px;
+    font-size: 13px;
     color: white;
     font-weight: 500;
     text-align: center;
 }
 
 .mini-player-time {
-    font-size: 11px;
+    font-size: 13px;
     color: white;
     font-weight: 500;
     white-space: nowrap;
@@ -154,7 +154,7 @@ form {
 
 .mini-progress-container {
     flex: 1;
-    height: 20px;
+    height: 24px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -162,9 +162,9 @@ form {
 
 .mini-progress-bg {
     width: 100%;
-    height: 4px;
+    height: 5px;
     background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 2px;
+    border-radius: 2.5px;
     position: relative;
     overflow: visible;
 }
@@ -183,8 +183,8 @@ form {
     top: 50%;
     left: 0%;
     transform: translate(-50%, -50%);
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     background-color: white;
     border-radius: 50%;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
@@ -198,8 +198,8 @@ form {
 
 .play-button-wrapper {
     position: relative;
-    width: 34px;
-    height: 34px;
+    width: 48px;
+    height: 48px;
     flex-shrink: 0;
 }
 
@@ -207,8 +207,8 @@ form {
     position: absolute;
     top: 0;
     left: 0;
-    width: 34px;
-    height: 34px;
+    width: 48px;
+    height: 48px;
     transform: rotate(-90deg);
 }
 
@@ -221,8 +221,8 @@ form {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: none;
     background-color: #007bff;
@@ -245,8 +245,8 @@ form {
 }
 
 .play-button svg {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     fill: white;
 }
 
@@ -314,7 +314,7 @@ form {
     }
 
     .progress-panel {
-        width: calc(100% - 44px);
+        width: calc(100% - 66px);
         margin-right: 0;
         margin-bottom: 0;
         position: static;
@@ -326,7 +326,7 @@ form {
     }
 
     .error-panel {
-        width: calc(100% - 44px);
+        width: calc(100% - 66px);
         margin-right: 0;
         margin-bottom: 0;
         position: static;
@@ -341,6 +341,53 @@ form {
     .play-button-wrapper {
         align-self: flex-end;
         margin: 0;
+        width: 56px;
+        height: 56px;
+    }
+
+    .progress-circle {
+        width: 56px;
+        height: 56px;
+    }
+
+    .play-button {
+        width: 52px;
+        height: 52px;
+    }
+
+    .play-button svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .progress-panel {
+        padding: 12px 20px;
+        gap: 16px;
+    }
+
+    .error-panel {
+        padding: 12px 20px;
+    }
+
+    .error-message {
+        font-size: 14px;
+    }
+
+    .mini-player-time {
+        font-size: 14px;
+    }
+
+    .mini-progress-container {
+        height: 28px;
+    }
+
+    .mini-progress-bg {
+        height: 6px;
+    }
+
+    .mini-progress-handle {
+        width: 14px;
+        height: 14px;
     }
 }
 

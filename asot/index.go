@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"sync"
 )
 
 type Song struct {
@@ -28,6 +29,7 @@ func newTrieNode() *trieNode {
 
 type index struct {
 	trieRoot trieNode
+	lock     sync.RWMutex
 }
 
 func NewIndex() *index {
@@ -52,6 +54,8 @@ func (idx *index) AddSong(episodeHash, episode, performer, title, timeIndex stri
 		episodeHash: episodeHash,
 	}
 
+	idx.lock.Lock()
+	defer idx.lock.Unlock()
 	for _, words := range [][]string{performerWords, titleWords} {
 		for _, word := range words {
 			curNode := &idx.trieRoot
@@ -90,6 +94,9 @@ func containsSong(curNode *trieNode, song *Song) bool {
 func (idx *index) SearchSong(song string) []*Song {
 	var results []*Song
 	words := strings.Fields(strings.ToLower(song))
+
+	idx.lock.RLock()
+	defer idx.lock.RUnlock()
 
 	songRank := make(map[*Song]int)
 	for _, word := range words {

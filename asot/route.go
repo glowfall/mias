@@ -3,10 +3,15 @@ package asot
 import (
 	"embed"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"time"
+)
+
+var (
+	audioPathRoot = flag.String("audioPathRoot", "/Users/myasnov/asot_data", "audio file path")
 )
 
 //go:embed static
@@ -15,10 +20,7 @@ var staticFiles embed.FS
 func Setup(mux *http.ServeMux) {
 	downloader := NewCachingDownloader()
 
-	index, err := NewIndexBuilder(downloader).BuildIndex()
-	if err != nil {
-		panic(err)
-	}
+	index := NewIndexBuilder(downloader).BuildIndexAsync()
 
 	staticDir, err := fs.Sub(staticFiles, "static")
 	if err != nil {
@@ -35,7 +37,7 @@ func Setup(mux *http.ServeMux) {
 		songs := index.SearchSong(query)
 
 		start := time.Now()
-		fmt.Printf("search performed in %v, results: %v\n", time.Now().Sub(start), len(songs))
+		fmt.Printf("search performed in %v, results: %v\n", time.Since(start), len(songs))
 
 		rw.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -68,6 +70,17 @@ func Setup(mux *http.ServeMux) {
 			panic(err)
 		}
 	})
+	mux.HandleFunc("GET /asot/audio", func(rw http.ResponseWriter, r *http.Request) {
+		episode := r.URL.Query().Get("episode")
+		if episode == "" {
+			http.Error(rw, "Missing episode parameter", http.StatusBadRequest)
+			return
+		}
+
+		audioPath := *audioPathRoot + "/" + episode + ".mp3"
+
+		http.ServeFile(rw, r, audioPath)
+	})
 }
 
 type songResult struct {
@@ -99,5 +112,4 @@ func writeError(rw http.ResponseWriter, msg string, err error) {
 	if innerErr != nil {
 		fmt.Printf("Unable to write err: %+v", innerErr)
 	}
-	return
 }

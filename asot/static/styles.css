@@ -59,10 +59,206 @@ form {
     background-color: #f9f9f9;
 }
 
+.result-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .result p {
     margin: 0;
     font-size: 16px;
     color: #333;
+    flex: 1;
+}
+
+/* Play Controls Wrapper */
+.play-controls-wrapper {
+    display: flex;
+    align-items: center;
+    margin-left: 15px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+/* Progress Panel (slides from left) */
+.progress-panel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    margin-right: 10px;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    width: 240px;
+}
+
+.progress-panel.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* Error Panel (slides from left, red color) */
+.error-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+    margin-right: 10px;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    width: 240px;
+    position: absolute;
+    right: 50px;
+}
+
+.error-panel.visible {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.error-message {
+    font-size: 12px;
+    color: white;
+    font-weight: 500;
+    text-align: center;
+}
+
+.mini-player-time {
+    font-size: 11px;
+    color: white;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.mini-time-separator {
+    margin: 0 2px;
+    opacity: 0.8;
+}
+
+.mini-progress-container {
+    flex: 1;
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.mini-progress-bg {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    position: relative;
+    overflow: visible;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    background-color: white;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.mini-progress-handle {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: left 0.1s linear;
+    pointer-events: none;
+}
+
+.mini-progress-container:hover .mini-progress-handle {
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+.play-button-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.progress-circle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    transform: rotate(-90deg);
+}
+
+.progress-ring {
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background-color: #007bff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    padding: 0;
+    z-index: 1;
+}
+
+.play-button:hover {
+    background-color: #0056b3;
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.play-button:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
+
+.play-button svg {
+    width: 16px;
+    height: 16px;
+    fill: white;
+}
+
+.play-icon {
+    padding-left: 2px;
+}
+
+.play-button.playing {
+    background-color: #28a745;
+}
+
+.play-button.playing:hover {
+    background-color: #218838;
 }
 
 .tracklist {

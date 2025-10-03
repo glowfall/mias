@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -52,13 +51,12 @@ func NewCachingDownloader() *cachingDownloader {
 
 func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
 	if result, err := d.GetCached(d.LinkHash(link)); err == nil {
-		fmt.Printf("found in cache: %s\n", link)
 		return result, nil
 	} else if !errors.Is(err, fs.ErrNotExist) {
 		return "", err
 	}
 
-	fmt.Printf("downloading: %s\n", link)
+	log.Printf("downloading: %s\n", link)
 
 	r, err := http.NewRequest("GET", link, nil)
 	if err != nil {
@@ -82,7 +80,7 @@ func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
 	cachedPath := d.cachedPath(d.LinkHash(link))
 
 	if err := os.WriteFile(cachedPath, []byte(bodyStr), 0777); err != nil {
-		fmt.Printf("unable to write to cache %s: %+v\n", cachedPath, err)
+		log.Printf("unable to write to cache %s: %+v\n", cachedPath, err)
 	}
 
 	return bodyStr, nil

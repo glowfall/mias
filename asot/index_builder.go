@@ -1,15 +1,19 @@
 package asot
 
 import (
+	"errors"
 	"fmt"
 	"html"
+	"log"
 	"regexp"
+	"sync"
 	"unicode/utf8"
 )
 
 type indexBuilder struct {
-	downloader *cachingDownloader
-	index      *index
+	downloader  *cachingDownloader
+	index       *index
+	onceBuilder sync.Once
 }
 
 func NewIndexBuilder(downloader *cachingDownloader) *indexBuilder {
@@ -22,22 +26,69 @@ func NewIndexBuilder(downloader *cachingDownloader) *indexBuilder {
 // <a href="/download.php?type=cue&amp;folder=asot&amp;filename=Armin+van+Buuren+-+A+State+Of+Trance+1005+%28256+Kbps%29+baby967.cue"><img src="/layout/download.png" alt="Download!"></a>
 var hrefRegexp = regexp.MustCompile(`<a href="(/download.php\?[^"]+)">`)
 
-func (i *indexBuilder) BuildIndex() (*index, error) {
+func (i *indexBuilder) BuildIndexAsync() *index {
+	i.onceBuilder.Do(func() {
+		go i.buildIndex()
+	})
+
+	return i.index
+}
+
+func (i *indexBuilder) buildIndex() {
+	log.Println("Starting index build in background...")
+
 	body, err := i.downloader.DownloadOrGetCached("https://www.cuenation.com/?page=cues&folder=asot")
 	if err != nil {
-		return nil, err
+		log.Printf("Error downloading index page: %+v", err)
+		return
 	}
 
 	submatches := hrefRegexp.FindAllStringSubmatch(body, -1)
-	fmt.Printf("submatches: %v\n", len(submatches))
+	log.Printf("Found %d episodes to index\n", len(submatches))
 
-	for _, match := range submatches {
-		if err := i.IndexCUE(html.UnescapeString(match[1])); err != nil {
-			return nil, err
+	ch := make(chan func() error, 100)
+
+	resCh := make(chan error, 100)
+	var errs []error
+
+	go func() {
+		for err := range resCh {
+			if err != nil {
+				errs = append(errs, err)
+			}
 		}
+	}()
+
+	var wg sync.WaitGroup
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					resCh <- fmt.Errorf("panic recovered: %v", r)
+				}
+			}()
+			for f := range ch {
+				resCh <- f()
+			}
+		}()
 	}
 
-	return i.index, nil
+	for _, match := range submatches {
+		ch <- func() error {
+			return i.IndexCUE(html.UnescapeString(match[1]))
+		}
+	}
+	close(ch)
+	wg.Wait()
+	close(resCh)
+
+	if len(errs) > 0 {
+		log.Printf("Index build completed with errors: %+v", errors.Join(errs...))
+	} else {
+		log.Println("Index build completed successfully")
+	}
 }
 
 var episodeRG = regexp.MustCompile(`(?im)^TITLE " *A State Of Trance (\d+)`)

@@ -41,7 +41,7 @@ func main() {
 			log.Fatalf("ListenAndServe error: %+v", err)
 		}
 	} else {
-		log.Printf("Listening on :80\n")
+		log.Printf("Listening on http://localhost/\n")
 		if err := http.ListenAndServe(":80", mux); err != nil {
 			log.Fatalf("ListenAndServe error: %+v", err)
 		}

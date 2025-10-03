@@ -84,7 +84,7 @@ form {
 
 /* Progress Panel (slides from left) */
 .progress-panel {
-    display: flex;
+    display: none;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -97,11 +97,11 @@ form {
     opacity: 0;
     transform: translateX(20px);
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
     width: 240px;
 }
 
 .progress-panel.visible {
+    display: flex;
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
@@ -109,7 +109,7 @@ form {
 
 /* Error Panel (slides from left, red color) */
 .error-panel {
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     padding: 8px 16px;
@@ -120,13 +120,13 @@ form {
     opacity: 0;
     transform: translateX(20px);
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: none;
     width: 240px;
     position: absolute;
     right: 50px;
 }
 
 .error-panel.visible {
+    display: flex;
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
@@ -273,4 +273,101 @@ form {
 
 .tracklist.show {
     display: block;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    #searchQuery {
+        margin-bottom: 10px;
+    }
+
+    .result-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .result p {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    .play-controls-wrapper {
+        width: 100%;
+        flex-direction: column-reverse;
+        margin-left: 0;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .progress-panel {
+        width: calc(100% - 44px);
+        margin-right: 0;
+        margin-bottom: 0;
+        position: static;
+        transform: none;
+    }
+
+    .progress-panel.visible {
+        transform: none;
+    }
+
+    .error-panel {
+        width: calc(100% - 44px);
+        margin-right: 0;
+        margin-bottom: 0;
+        position: static;
+        right: auto;
+        transform: none;
+    }
+
+    .error-panel.visible {
+        transform: none;
+    }
+
+    .play-button-wrapper {
+        align-self: flex-end;
+        margin: 0;
+    }
+}
+
+/* Extra small devices (phones in portrait mode) */
+@media (max-width: 480px) {
+    .container {
+        margin: 10px;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    .result {
+        padding: 8px;
+    }
+
+    .result p {
+        font-size: 14px;
+    }
+
+    .progress-panel {
+        padding: 6px 10px;
+    }
+
+    .mini-player-time {
+        font-size: 10px;
+    }
 }

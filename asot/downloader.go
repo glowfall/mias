@@ -50,7 +50,8 @@ func NewCachingDownloader() *cachingDownloader {
 }
 
 func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
-	if result, err := d.GetCached(d.LinkHash(link)); err == nil {
+	hash := d.LinkHash(link)
+	if result, err := d.GetCached(hash); err == nil {
 		return result, nil
 	} else if !errors.Is(err, fs.ErrNotExist) {
 		return "", err
@@ -77,7 +78,7 @@ func (d *cachingDownloader) DownloadOrGetCached(link string) (string, error) {
 
 	bodyStr := cp1252ToUTF8(string(body))
 
-	cachedPath := d.cachedPath(d.LinkHash(link))
+	cachedPath := d.cachedPath(hash)
 
 	if err := os.WriteFile(cachedPath, []byte(bodyStr), 0777); err != nil {
 		log.Printf("unable to write to cache %s: %+v\n", cachedPath, err)

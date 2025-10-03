@@ -38,9 +38,6 @@ func Setup(mux *http.ServeMux) {
 
 		rw.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		if len(songs) == 0 {
-			return
-		}
 		results := make([]songResult, 0, len(songs))
 		for _, song := range songs {
 			results = append(results, songResult{

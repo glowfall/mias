@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
 
-            if (data && Array.isArray(data.results)) {
+            if (data && Array.isArray(data.results) && data.results.length > 0) {
                 displayResults(data.results);
                 displayResultsCount(data.count);
             } else {
@@ -49,22 +49,22 @@ document.addEventListener('DOMContentLoaded', () => {
         results.forEach((result) => {
             const resultElement = document.createElement('div');
             resultElement.classList.add('result');
-            
+
             // Create the main content wrapper
             const contentWrapper = document.createElement('div');
             contentWrapper.classList.add('result-content');
-            
+
             const titleElement = document.createElement('p');
             titleElement.textContent = result.title;
             contentWrapper.appendChild(titleElement);
-            
+
             // Add play button if play mode is enabled
             if (playModeEnabled) {
                 const episodeNumber = extractEpisodeNumber(result.title);
                 if (episodeNumber) {
                     const playControlsWrapper = document.createElement('div');
                     playControlsWrapper.classList.add('play-controls-wrapper');
-                    
+
                     // Create progress panel (hidden by default)
                     const progressPanel = document.createElement('div');
                     progressPanel.classList.add('progress-panel');
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
                     playControlsWrapper.appendChild(progressPanel);
-                    
+
                     // Create error panel (hidden by default)
                     const errorPanel = document.createElement('div');
                     errorPanel.classList.add('error-panel');
@@ -90,11 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="error-message">Failed to load audio</div>
                     `;
                     playControlsWrapper.appendChild(errorPanel);
-                    
+
                     // Create play button wrapper
                     const playButtonWrapper = document.createElement('div');
                     playButtonWrapper.classList.add('play-button-wrapper');
-                    
+
                     const playButton = document.createElement('button');
                     playButton.classList.add('play-button');
                     playButton.innerHTML = `
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </svg>
                     `;
                     playButton.title = `Play ASOT ${episodeNumber}`;
-                    
+
                     // Add progress circle
                     const progressCircle = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     progressCircle.classList.add('progress-circle');
@@ -120,16 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     playButtonWrapper.appendChild(progressCircle);
                     playButtonWrapper.appendChild(playButton);
                     playControlsWrapper.appendChild(playButtonWrapper);
-                    
+
                     playButton.addEventListener('click', (e) => {
                         e.stopPropagation();
                         toggleAudioPlayback(episodeNumber, playButton, playButtonWrapper, progressPanel, errorPanel);
                     });
-                    
+
                     contentWrapper.appendChild(playControlsWrapper);
                 }
             }
-            
+
             resultElement.appendChild(contentWrapper);
 
             resultElement.addEventListener('click', async () => {
@@ -161,17 +161,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleAudioPlayback(episodeNumber, button, wrapper, progressPanel, errorPanel) {
         const audioPath = `/asot/audio?episode=${episodeNumber}`;
-        
+
         // Hide error panel if it was shown before
         hideErrorPanel(errorPanel);
-        
+
         // If there's a different audio playing, stop it
         if (currentAudio && currentPlayButton && currentPlayButton !== button) {
             currentAudio.pause();
             updatePlayButtonState(currentPlayButton, false);
             hideProgressPanel(currentProgressPanel);
         }
-        
+
         // If clicking the same button
         if (currentAudio && currentPlayButton === button) {
             if (currentAudio.paused) {
@@ -183,41 +183,41 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return;
         }
-        
+
         // Create new audio element
         const audio = new Audio(audioPath);
         currentAudio = audio;
         currentPlayButton = button;
         currentEpisodeNumber = episodeNumber;
         currentProgressPanel = progressPanel;
-        
+
         // Update progress ring
         const progressRing = wrapper.querySelector('.progress-ring');
         const miniCurrentTime = progressPanel.querySelector('.mini-current-time');
         const miniTotalTime = progressPanel.querySelector('.mini-total-time');
         const miniProgressFill = progressPanel.querySelector('.mini-progress-fill');
         const miniProgressHandle = progressPanel.querySelector('.mini-progress-handle');
-        
+
         audio.addEventListener('timeupdate', () => {
             if (audio.duration) {
                 const progress = (audio.currentTime / audio.duration) * 100;
                 const offset = 100 - progress;
                 progressRing.style.strokeDashoffset = offset;
-                
+
                 // Update mini player progress
                 miniCurrentTime.textContent = formatTime(audio.currentTime);
                 miniProgressFill.style.width = `${progress}%`;
                 miniProgressHandle.style.left = `${progress}%`;
             }
         });
-        
+
         // Handle when metadata is loaded (file found)
         audio.addEventListener('loadedmetadata', () => {
             miniTotalTime.textContent = formatTime(audio.duration);
             showProgressPanel(progressPanel);
             setupMiniProgressBar(progressPanel, audio);
         });
-        
+
         // Handle audio end
         audio.addEventListener('ended', () => {
             updatePlayButtonState(button, false);
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentEpisodeNumber = null;
             currentProgressPanel = null;
         });
-        
+
         // Handle errors (404, etc)
         audio.addEventListener('error', (e) => {
             console.error('Error loading audio:', e);
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentEpisodeNumber = null;
             currentProgressPanel = null;
         });
-        
+
         audio.play().catch((err) => {
             console.error('Error playing audio:', err);
             updatePlayButtonState(button, false);
@@ -297,12 +297,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const seek = (e) => {
             if (!audio || !audio.duration) return;
-            
+
             const rect = container.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const percentage = Math.max(0, Math.min(1, x / rect.width));
             const newTime = percentage * audio.duration;
-            
+
             audio.currentTime = newTime;
             fill.style.width = `${percentage * 100}%`;
             handle.style.left = `${percentage * 100}%`;
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updatePlayButtonState(button, isPlaying) {
         const playIcon = button.querySelector('.play-icon');
         const pauseIcon = button.querySelector('.pause-icon');
-        
+
         if (isPlaying) {
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';

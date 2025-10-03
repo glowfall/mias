@@ -53,7 +53,7 @@ form {
 
 .result {
     margin-bottom: 10px;
-    padding: 10px;
+    padding: 6px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f9f9f9;
@@ -70,6 +70,7 @@ form {
     font-size: 16px;
     color: #333;
     flex: 1;
+    line-height: 1.2;
 }
 
 /* Play Controls Wrapper */
@@ -197,8 +198,8 @@ form {
 
 .play-button-wrapper {
     position: relative;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
 }
 
@@ -206,8 +207,8 @@ form {
     position: absolute;
     top: 0;
     left: 0;
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     transform: rotate(-90deg);
 }
 
@@ -220,8 +221,8 @@ form {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: none;
     background-color: #007bff;
@@ -244,8 +245,8 @@ form {
 }
 
 .play-button svg {
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     fill: white;
 }
 

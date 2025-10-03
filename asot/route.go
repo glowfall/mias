@@ -3,15 +3,12 @@ package asot
 import (
 	"embed"
 	"encoding/json"
-	"flag"
 	"fmt"
+	"io"
 	"io/fs"
+	"log"
 	"net/http"
 	"time"
-)
-
-var (
-	audioPathRoot = flag.String("audioPathRoot", "/Users/myasnov/asot_data", "audio file path")
 )
 
 //go:embed static
@@ -70,6 +67,9 @@ func Setup(mux *http.ServeMux) {
 			panic(err)
 		}
 	})
+	proxyClient := &http.Client{
+		Timeout: 30 * time.Second,
+	}
 	mux.HandleFunc("GET /asot/audio", func(rw http.ResponseWriter, r *http.Request) {
 		episode := r.URL.Query().Get("episode")
 		if episode == "" {
@@ -77,9 +77,37 @@ func Setup(mux *http.ServeMux) {
 			return
 		}
 
-		audioPath := *audioPathRoot + "/" + episode + ".mp3"
+		proxyURL := fmt.Sprintf("https://bfgc2.miroppb.com/asot/ASOT_Ep_%s.mp3", episode)
 
-		http.ServeFile(rw, r, audioPath)
+		proxyReq, err := http.NewRequestWithContext(r.Context(), "GET", proxyURL, nil)
+		if err != nil {
+			http.Error(rw, "Failed to create proxy request", http.StatusInternalServerError)
+			return
+		}
+
+		if rangeHeader := r.Header.Get("Range"); rangeHeader != "" {
+			proxyReq.Header.Set("Range", rangeHeader)
+		}
+
+		resp, err := proxyClient.Do(proxyReq)
+		if err != nil {
+			http.Error(rw, "Failed to fetch audio from remote server", http.StatusBadGateway)
+			return
+		}
+		defer resp.Body.Close()
+
+		for key, values := range resp.Header {
+			for _, value := range values {
+				rw.Header().Add(key, value)
+			}
+		}
+
+		rw.WriteHeader(resp.StatusCode)
+
+		if _, err := io.Copy(rw, resp.Body); err != nil {
+			log.Printf("Error copying response body: %v\n", err)
+			return
+		}
 	})
 }
 

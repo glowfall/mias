@@ -72,19 +72,25 @@ func (idx *index) AddSong(episodeHash, episode, performer, title, timeIndex stri
 		episodeHash: episodeHash,
 	}
 
-	idx.lock.Lock()
-	defer idx.lock.Unlock()
+	// Collect unique words to avoid adding the same song twice for duplicate words
+	uniqueWords := make(map[string]bool)
 	for _, words := range [][]string{performerWords, titleWords} {
 		for _, word := range words {
-			curNode := &idx.trieRoot
-			for i, char := range word {
-				if curNode.children[char] == nil {
-					curNode.children[char] = newTrieNode()
-				}
-				curNode = curNode.children[char]
-				if i > 1 || len(word) < 3 {
-					curNode.songs = append(curNode.songs, song)
-				}
+			uniqueWords[word] = true
+		}
+	}
+
+	idx.lock.Lock()
+	defer idx.lock.Unlock()
+	for word := range uniqueWords {
+		curNode := &idx.trieRoot
+		for i, char := range word {
+			if curNode.children[char] == nil {
+				curNode.children[char] = newTrieNode()
+			}
+			curNode = curNode.children[char]
+			if i > 1 || len(word) < 3 {
+				curNode.songs = append(curNode.songs, song)
 			}
 		}
 	}

@@ -425,21 +425,109 @@ form {
 
     h1 {
         font-size: 20px;
+        margin: 10px 0;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    #searchQuery {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 14px;
+        margin-bottom: 0;
+    }
+
+    #searchButton {
+        width: 100%;
+        padding: 10px 20px;
+        font-size: 14px;
     }
 
     .result {
         padding: 8px;
+        margin-bottom: 8px;
+    }
+
+    .result-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
     }
 
     .result p {
         font-size: 14px;
+        line-height: 1.4;
+        word-break: break-word;
+    }
+
+    .play-controls-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        margin-left: 0;
+        gap: 8px;
     }
 
     .progress-panel {
-        padding: 6px 10px;
+        padding: 8px 12px;
+        width: auto;
+        flex: 1;
+        min-width: 0;
+        margin-right: 8px;
+    }
+
+    .error-panel {
+        padding: 8px 12px;
+        width: auto;
+        flex: 1;
+        min-width: 0;
+        margin-right: 8px;
+    }
+
+    .play-button-wrapper {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+    }
+
+    .progress-circle {
+        width: 48px;
+        height: 48px;
+    }
+
+    .play-button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .play-button svg {
+        width: 24px;
+        height: 24px;
     }
 
     .mini-player-time {
-        font-size: 10px;
+        font-size: 11px;
+    }
+
+    .mini-progress-container {
+        height: 24px;
+        min-width: 60px;
+    }
+
+    .mini-progress-bg {
+        height: 5px;
+    }
+
+    .mini-progress-handle {
+        width: 12px;
+        height: 12px;
     }
 }

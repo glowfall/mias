@@ -8,10 +8,10 @@ import (
 
 func TestIndex(t *testing.T) {
 	index := NewIndex()
-	index.AddSong("300", "Armin", "Song1", "10:00")
-	index.AddSong("300", "Mat Zoo", "Clockwork", "01:00")
-	index.AddSong("306", "Mat Zoo", "Song1", "01:00")
-	index.AddSong("302", "Armin", "Clockwork", "10:00")
+	index.AddSong("hash300", "300", "Armin", "Song1", "10:00")
+	index.AddSong("hash300", "300", "Mat Zoo", "Clockwork", "01:00")
+	index.AddSong("hash306", "306", "Mat Zoo", "Song1", "01:00")
+	index.AddSong("hash302", "302", "Armin", "Clockwork", "10:00")
 
 	require.Len(t, index.SearchSong("cLock"), 2)
 	require.Len(t, index.SearchSong("zoo"), 2)

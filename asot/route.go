@@ -41,7 +41,7 @@ func Setup(mux *http.ServeMux) {
 		results := make([]songResult, 0, len(songs))
 		for _, song := range songs {
 			results = append(results, songResult{
-				Title:       fmt.Sprintf("ASOT %s: %s", song.episode, song.title),
+				Title:       fmt.Sprintf("ASOT %v: %s", song.episodeNum, song.title),
 				EpisodeHash: song.episodeHash,
 			})
 		}

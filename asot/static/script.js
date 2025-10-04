@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentEpisodeNumber = null;
     let currentProgressPanel = null;
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const query = searchInput.value.trim();
-
+    // Perform search and update URL
+    async function performSearch(query, updateHistory = true) {
         if (query === '') {
             return;
         }
+
+        const startTime = performance.now();
 
         try {
             const response = await fetch(`search?query=${encodeURIComponent(query)}`, {
@@ -28,20 +28,68 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
+            const endTime = performance.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(3);
 
             if (data && Array.isArray(data.results) && data.results.length > 0) {
                 displayResults(data.results);
-                displayResultsCount(data.count);
+                displayResultsCount(data.count, duration);
             } else {
                 displayError('No results found.');
-                displayResultsCount(0);
+                displayResultsCount(0, duration);
+            }
+
+            // Update URL with query parameter
+            if (updateHistory) {
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.set('query', query);
+                if (playModeEnabled) {
+                    newUrl.searchParams.set('play', 'true');
+                }
+
+                // Use replaceState if same query, pushState if different
+                const currentUrlQuery = new URLSearchParams(window.location.search).get('query');
+                if (currentUrlQuery === query) {
+                    history.replaceState({ query }, '', newUrl);
+                } else {
+                    history.pushState({ query }, '', newUrl);
+                }
             }
         } catch (error) {
             console.error('Error fetching search results:', error);
             displayError('An error occurred. Please try again.');
             displayResultsCount(0);
         }
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        await performSearch(query);
     });
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('query');
+
+        if (query) {
+            searchInput.value = query;
+            performSearch(query, false);
+        } else {
+            // Clear search results if no query in URL
+            searchResultsContainer.innerHTML = '';
+            searchCountContainer.textContent = '';
+            searchInput.value = '';
+        }
+    });
+
+    // Check if there's a query parameter on page load and perform search
+    const initialQuery = urlParams.get('query');
+    if (initialQuery) {
+        searchInput.value = initialQuery;
+        performSearch(initialQuery, false);
+    }
 
     function displayResults(results) {
         searchResultsContainer.innerHTML = '';
@@ -201,8 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.addEventListener('timeupdate', () => {
             if (audio.duration) {
                 const progress = (audio.currentTime / audio.duration) * 100;
-                const offset = 100 - progress;
-                progressRing.style.strokeDashoffset = offset;
+                progressRing.style.strokeDashoffset = `${100 - progress}`;
 
                 // Update mini player progress
                 miniCurrentTime.textContent = formatTime(audio.currentTime);
@@ -301,9 +348,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = container.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const percentage = Math.max(0, Math.min(1, x / rect.width));
-            const newTime = percentage * audio.duration;
 
-            audio.currentTime = newTime;
+            audio.currentTime = percentage * audio.duration;
             fill.style.width = `${percentage * 100}%`;
             handle.style.left = `${percentage * 100}%`;
         };
@@ -359,8 +405,12 @@ document.addEventListener('DOMContentLoaded', () => {
         element.classList.toggle('show');
     }
 
-    function displayResultsCount(count) {
-        searchCountContainer.textContent = `Found ${count} result(s)`;
+    function displayResultsCount(count, duration) {
+        if (duration) {
+            searchCountContainer.textContent = `Found ${count} result(s) in ${duration} seconds`;
+        } else {
+            searchCountContainer.textContent = `Found ${count} result(s)`;
+        }
     }
 
     function displayError(message) {

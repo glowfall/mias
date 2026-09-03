@@ -5,7 +5,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/root/go/bin/asot --useTLS=false --listenAddress=127.0.0.1:8080
+ExecStart=/root/go/bin/asot --listenAddress=127.0.0.1:8080
 Restart=on-failure
 RestartSec=5s
 

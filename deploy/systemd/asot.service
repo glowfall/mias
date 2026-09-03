@@ -1,0 +1,13 @@
+[Unit]
+Description=ASOT Searcher
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/root/go/bin/asot --useTLS=false --listenAddress=127.0.0.1:8080
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

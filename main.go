@@ -12,6 +12,7 @@ import (
 )
 
 var useTLS = flag.Bool("useTLS", true, "--useTLS=false")
+var listenAddress = flag.String("listenAddress", ":80", "HTTP listen address when TLS is disabled")
 
 //go:embed static
 var staticDir embed.FS
@@ -41,8 +42,8 @@ func main() {
 			log.Fatalf("ListenAndServe error: %+v", err)
 		}
 	} else {
-		log.Printf("Listening on http://localhost/\n")
-		if err := http.ListenAndServe(":80", mux); err != nil {
+		log.Printf("Listening on http://%s/\n", *listenAddress)
+		if err := http.ListenAndServe(*listenAddress, mux); err != nil {
 			log.Fatalf("ListenAndServe error: %+v", err)
 		}
 	}
